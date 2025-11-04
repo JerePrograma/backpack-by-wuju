@@ -19,6 +19,7 @@ package at.pcgamingfreaks.Minepacks.Bukkit;
 
 import at.pcgamingfreaks.Minepacks.Bukkit.API.WorldBlacklistMode;
 import at.pcgamingfreaks.Minepacks.Bukkit.Listener.ItemFilter;
+import at.pcgamingfreaks.Minepacks.Bukkit.config.MinepacksConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -29,8 +30,8 @@ import java.util.*;
 
 public class ItemsCollector extends CancellableRunnable {
 	private final Minepacks plugin;
-	private final double radius;
-	private final ItemFilter itemFilter;
+        private final double radius;
+        private final ItemFilter itemFilter;
 
 	/**
 	 * Is the feature enabled?
@@ -40,7 +41,8 @@ public class ItemsCollector extends CancellableRunnable {
 	/**
 	 * Default on join?
 	 */
-	private final boolean enabledOnJoin;
+        private final boolean enabledOnJoin;
+        private final long checkInterval;
 
 	/**
 	 * List of players that toggled the feature.
@@ -49,14 +51,16 @@ public class ItemsCollector extends CancellableRunnable {
 
 	public ItemsCollector(Minepacks plugin)
 	{
-		this.plugin = plugin;
-		this.radius = plugin.getConfiguration().getFullInvRadius();
+                this.plugin = plugin;
+                MinepacksConfiguration.FullInventorySettings settings = plugin.getConfiguration().fullInventory();
+                this.radius = settings.getCollectRadius();
 
-		this.isToggleable = plugin.getConfiguration().isFullInvToggleAllowed();
-		this.enabledOnJoin = plugin.getConfiguration().isFullInvEnabledOnJoin();
-		this.toggleList = new HashSet<>();
-		schedule();
-		itemFilter = plugin.getItemFilter();
+                this.isToggleable = settings.isToggleAllowed();
+                this.enabledOnJoin = settings.isEnabledOnJoin();
+                this.checkInterval = settings.getCheckInterval();
+                this.toggleList = new HashSet<>();
+                schedule();
+                itemFilter = plugin.getItemFilter();
 	}
 
 	public boolean canUseAutoPickup(Player player)
@@ -120,9 +124,9 @@ public class ItemsCollector extends CancellableRunnable {
 	}
 
 	@Override
-	public void schedule() {
-		task = getScheduler().runTimer(this::run, plugin.getConfiguration().getFullInvCheckInterval(), plugin.getConfiguration().getFullInvCheckInterval());
-	}
+        public void schedule() {
+                task = getScheduler().runTimer(this::run, checkInterval, checkInterval);
+        }
 
 	public void close() {
 		cancel();

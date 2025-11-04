@@ -25,6 +25,7 @@ import at.pcgamingfreaks.Bukkit.MinecraftMaterial;
 import at.pcgamingfreaks.Message.Placeholder.Placeholder;
 import at.pcgamingfreaks.Minepacks.Bukkit.API.Backpack;
 import at.pcgamingfreaks.Minepacks.Bukkit.Minepacks;
+import at.pcgamingfreaks.Minepacks.Bukkit.config.MinepacksConfiguration;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 public class ItemFilter extends MinepacksListener implements at.pcgamingfreaks.Minepacks.Bukkit.API.ItemFilter
 {
@@ -45,25 +47,27 @@ public class ItemFilter extends MinepacksListener implements at.pcgamingfreaks.M
 
 	public ItemFilter(final Minepacks plugin)
 	{
-		super(plugin);
+                super(plugin);
 
-		boolean whitelistMode = plugin.getConfiguration().isItemFilterModeWhitelist();
-		filter = new at.pcgamingfreaks.Bukkit.ItemFilter(whitelistMode);
-		Collection<MinecraftMaterial> filteredMaterials = plugin.getConfiguration().getItemFilterMaterials();
-		if(plugin.getConfiguration().isShulkerboxesPreventInBackpackEnabled() && !whitelistMode)
-		{
-			for(Material mat : DisableShulkerboxes.SHULKER_BOX_MATERIALS)
-			{
-				filteredMaterials.add(new MinecraftMaterial(mat, (short) -1));
-			}
-		}
-		filter.addFilteredMaterials(filteredMaterials);
-		filter.addFilteredNames(plugin.getConfiguration().getItemFilterNames());
-		filter.addFilteredLore(plugin.getConfiguration().getItemFilterLore());
+                MinepacksConfiguration configuration = plugin.getConfiguration();
+                MinepacksConfiguration.ItemFilterSettings settings = configuration.itemFilter();
+                boolean whitelistMode = settings.isWhitelistMode();
+                filter = new at.pcgamingfreaks.Bukkit.ItemFilter(whitelistMode);
+                Collection<MinecraftMaterial> filteredMaterials = new LinkedList<>(settings.getFilteredMaterials());
+                if(configuration.shulkerboxes().isPreventInBackpack() && !whitelistMode)
+                {
+                        for(Material mat : DisableShulkerboxes.SHULKER_BOX_MATERIALS)
+                        {
+                                filteredMaterials.add(new MinecraftMaterial(mat, (short) -1));
+                        }
+                }
+                filter.addFilteredMaterials(filteredMaterials);
+                filter.addFilteredNames(settings.getFilteredNames());
+                filter.addFilteredLore(settings.getFilteredLore());
 
 		/*if[STANDALONE]
-		itemNameResolver = new ItemNameResolver();
-		itemNameResolver.load(plugin, plugin.getConfiguration());
+                itemNameResolver = new ItemNameResolver();
+                itemNameResolver.load(plugin, configuration);
 		else[STANDALONE]*/
 		itemNameResolver = at.pcgamingfreaks.PluginLib.Bukkit.ItemNameResolver.getInstance();
 		/*end[STANDALONE]*/

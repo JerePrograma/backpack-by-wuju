@@ -24,6 +24,7 @@ import at.pcgamingfreaks.Minepacks.Bukkit.API.Backpack;
 import at.pcgamingfreaks.Minepacks.Bukkit.API.Events.InventoryClearedEvent;
 import at.pcgamingfreaks.Minepacks.Bukkit.API.WorldBlacklistMode;
 import at.pcgamingfreaks.Minepacks.Bukkit.Minepacks;
+import at.pcgamingfreaks.Minepacks.Bukkit.config.MinepacksConfiguration;
 import at.pcgamingfreaks.Minepacks.Bukkit.Permissions;
 
 import org.bukkit.ChatColor;
@@ -57,15 +58,16 @@ public class ItemShortcut extends MinepacksListener
 
 	public ItemShortcut(final @NotNull Minepacks plugin)
 	{
-		super(plugin);
-		itemName = ChatColor.translateAlternateColorCodes('&', plugin.getConfiguration().getItemShortcutItemName());
-		itemNameNoReset = itemName.replace(ChatColor.RESET.toString(), "");
-		value = plugin.getConfiguration().getItemShortcutHeadValue();
-		improveDeathChestCompatibility = plugin.getConfiguration().isItemShortcutImproveDeathChestCompatibilityEnabled();
-		blockAsHat = plugin.getConfiguration().isItemShortcutBlockAsHatEnabled();
-		allowRightClickOnContainers = plugin.getConfiguration().isItemShortcutRightClickOnContainerAllowed();
-		preferredSlotId = plugin.getConfiguration().getItemShortcutPreferredSlotId();
-		blockItemFromMoving = plugin.getConfiguration().getItemShortcutBlockItemFromMoving();
+                super(plugin);
+                MinepacksConfiguration.ItemShortcutSettings settings = plugin.getConfiguration().itemShortcut();
+                itemName = ChatColor.translateAlternateColorCodes('&', settings.getItemName());
+                itemNameNoReset = itemName.replace(ChatColor.RESET.toString(), "");
+                value = settings.getHeadTextureValue();
+                improveDeathChestCompatibility = settings.isImproveDeathChestCompatibilityEnabled();
+                blockAsHat = settings.isBlockAsHatEnabled();
+                allowRightClickOnContainers = settings.isRightClickOnContainerAllowed();
+                preferredSlotId = settings.getPreferredSlotId();
+                blockItemFromMoving = settings.isBlockItemFromMoving();
 		openCommand = plugin.getLanguage().getCommandAliases("Backpack", "backpack")[0] + ' ' + plugin.getLanguage().getCommandAliases("Open", "open")[0];
 		messageDoNotRemoveItem = plugin.getLanguage().getMessage("Ingame.DontRemoveShortcut");
 
