@@ -4,7 +4,7 @@ website: "${project.url}"
 main: "${mainClass}"
 description: "${project.description}"
 version: "${pluginVersion}"
-api-version: "1.13"
+api-version: "1.21"
 depend: [${dependencies}]
 softdepend: [MVdWPlaceholderAPI, PlaceholderAPI ${soft-dependencies}]
 folia-supported: true

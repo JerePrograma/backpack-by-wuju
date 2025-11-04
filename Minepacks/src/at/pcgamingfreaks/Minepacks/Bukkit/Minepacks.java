@@ -66,8 +66,9 @@ import java.util.Set;
 
 public class Minepacks extends JavaPlugin implements MinepacksPlugin, IPlugin
 {
-	@Getter private static Minepacks instance = null;
-	@Getter private static FoliaLib foliaLib = null;
+        @Getter private static Minepacks instance = null;
+        @Getter private static FoliaLib foliaLib = null;
+        private static final MCVersion LATEST_SUPPORTED_MC_VERSION = resolveLatestSupportedMcVersion();
 
         private ManagedUpdater updater = null;
         private MinepacksConfiguration config;
@@ -128,20 +129,49 @@ public class Minepacks extends JavaPlugin implements MinepacksPlugin, IPlugin
 
 	private boolean checkMcVersion()
 	{
-		if (MCVersion.isNewerThan(MCVersion.MC_NMS_1_20_R3) && ServerType.isPaperCompatible())
-		{
-			getLogger().warning("Paper support is experimental! Use at your own risk!");
-			getLogger().warning("No guarantee for data integrity! Backup constantly!");
-		}
-		// DO NOT REMOVE THIS! This is protecting your data! To add support for a new version, update PCGF PluginLib and then update the last version check!
-		if (MCVersion.is(MCVersion.UNKNOWN) || !MCVersion.isUUIDsSupportAvailable() || MCVersion.isNewerThan(MCVersion.MC_NMS_1_21_R6))
-		{
-			this.warnOnVersionIncompatibility();
-			this.setEnabled(false);
-			return false;
-		}
-		return true;
-	}
+                if (MCVersion.isNewerThan(MCVersion.MC_NMS_1_20_R3) && ServerType.isPaperCompatible())
+                {
+                        getLogger().warning("Paper support is experimental! Use at your own risk!");
+                        getLogger().warning("No guarantee for data integrity! Backup constantly!");
+                }
+                // DO NOT REMOVE THIS! This is protecting your data! To add support for a new version, update PCGF PluginLib and then update the last version check!
+                if (MCVersion.is(MCVersion.UNKNOWN) || !MCVersion.isUUIDsSupportAvailable() || MCVersion.isNewerThan(LATEST_SUPPORTED_MC_VERSION))
+                {
+                        this.warnOnVersionIncompatibility();
+                        this.setEnabled(false);
+                        return false;
+                }
+                return true;
+        }
+
+        private static MCVersion resolveLatestSupportedMcVersion()
+        {
+                MCVersion latestSupported = tryGetMcVersion("MC_NMS_1_21_R10");
+                if (latestSupported != null)
+                {
+                        return latestSupported;
+                }
+
+                latestSupported = tryGetMcVersion("MC_NMS_1_21_R6");
+                if (latestSupported != null)
+                {
+                        return latestSupported;
+                }
+
+                return MCVersion.MC_NMS_1_20_R3;
+        }
+
+        private static MCVersion tryGetMcVersion(@NotNull String fieldName)
+        {
+                try
+                {
+                        return (MCVersion) MCVersion.class.getField(fieldName).get(null);
+                }
+                catch (IllegalAccessException | NoSuchFieldException ignored)
+                {
+                        return null;
+                }
+        }
 
 	private boolean checkPCGF_PluginLib()
 	{
