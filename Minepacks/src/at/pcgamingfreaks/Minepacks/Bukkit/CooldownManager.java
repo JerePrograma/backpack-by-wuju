@@ -17,6 +17,8 @@
 
 package at.pcgamingfreaks.Minepacks.Bukkit;
 
+import at.pcgamingfreaks.Minepacks.Bukkit.config.MinepacksConfiguration;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -34,17 +36,20 @@ public class CooldownManager extends CancellableRunnable implements Listener
 {
 	private final Minepacks plugin;
 	private final Map<UUID, Long> cooldowns = new HashMap<>();
-	private final long cooldown;
-	private final boolean syncCooldown, addOnJoin, clearOnLeave;
+        private final long cooldown;
+        private final boolean syncCooldown, addOnJoin, clearOnLeave;
+        private final long cleanupInterval;
 
 	public CooldownManager(Minepacks plugin)
 	{
 		this.plugin = plugin;
 
-		cooldown = plugin.getConfiguration().getCommandCooldown();
-		syncCooldown = plugin.getConfiguration().isCommandCooldownSyncEnabled();
-		addOnJoin = plugin.getConfiguration().isCommandCooldownAddOnJoinEnabled();
-		clearOnLeave = plugin.getConfiguration().isCommandCooldownClearOnLeaveEnabled();
+                MinepacksConfiguration.CooldownSettings settings = plugin.getConfiguration().cooldown();
+                cooldown = settings.getCommandCooldown();
+                syncCooldown = settings.isSyncEnabled();
+                addOnJoin = settings.isAddOnJoinEnabled();
+                clearOnLeave = settings.isClearOnLeaveEnabled();
+                cleanupInterval = settings.getCleanupInterval();
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		schedule();
 	}
@@ -109,7 +114,7 @@ public class CooldownManager extends CancellableRunnable implements Listener
 	}
 
 	@Override
-	public void schedule() {
-		task = getScheduler().runTimer(this::run, plugin.getConfiguration().getCommandCooldownCleanupInterval(), plugin.getConfiguration().getCommandCooldownCleanupInterval());
-	}
+        public void schedule() {
+                task = getScheduler().runTimer(this::run, cleanupInterval, cleanupInterval);
+        }
 }

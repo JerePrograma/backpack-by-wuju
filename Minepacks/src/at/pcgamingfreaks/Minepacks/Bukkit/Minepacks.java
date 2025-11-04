@@ -29,7 +29,7 @@ import at.pcgamingfreaks.Minepacks.Bukkit.API.Backpack;
 import at.pcgamingfreaks.Minepacks.Bukkit.Command.CommandManager;
 import at.pcgamingfreaks.Minepacks.Bukkit.Command.InventoryClearCommand;
 import at.pcgamingfreaks.Minepacks.Bukkit.Command.ShortcutCommand;
-import at.pcgamingfreaks.Minepacks.Bukkit.Database.Config;
+import at.pcgamingfreaks.Minepacks.Bukkit.config.MinepacksConfiguration;
 import at.pcgamingfreaks.Minepacks.Bukkit.Database.Database;
 import at.pcgamingfreaks.Minepacks.Bukkit.Database.Language;
 import at.pcgamingfreaks.Minepacks.Bukkit.Listener.*;
@@ -69,8 +69,8 @@ public class Minepacks extends JavaPlugin implements MinepacksPlugin, IPlugin
 	@Getter private static Minepacks instance = null;
 	@Getter private static FoliaLib foliaLib = null;
 
-	private ManagedUpdater updater = null;
-	private Config config;
+        private ManagedUpdater updater = null;
+        private MinepacksConfiguration config;
 	private Language lang;
 	@Getter private Database database;
 
@@ -114,7 +114,7 @@ public class Minepacks extends JavaPlugin implements MinepacksPlugin, IPlugin
 		updater = new ManagedUpdater(this);
 		instance = this;
 		foliaLib = new FoliaLib(this);
-		config = new Config(this);
+                config = new MinepacksConfiguration(this);
 		updater.setChannel(config.getUpdateChannel());
 		if(config.useUpdater()) updater.update();
 
@@ -283,10 +283,10 @@ public class Minepacks extends JavaPlugin implements MinepacksPlugin, IPlugin
 		Utils.blockThread(5);
 	}
 
-	public Config getConfiguration()
-	{
-		return config;
-	}
+        public MinepacksConfiguration getConfiguration()
+        {
+                return config;
+        }
 
 	public Language getLanguage()
 	{
